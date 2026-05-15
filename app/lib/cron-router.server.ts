@@ -8,8 +8,7 @@ import config from "../../appapprove.config";
 // what the bundler expects (it can't follow dynamic imports built from
 // runtime config).
 const HANDLERS: Record<string, () => Promise<{ default: CronHandler }>> = {
-  // Example — uncomment after adding the schedule to wrangler.toml [triggers]:
-  // "0 * * * *": () => import("../crons/example-cleanup"),
+  "*/15 * * * *": () => import("../crons/email-pipeline"),
   "0 8 * * *": () => import("../crons/gdpr-deadline-check"),
 };
 

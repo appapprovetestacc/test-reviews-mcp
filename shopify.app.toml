@@ -11,12 +11,21 @@ embedded = true
 [access_scopes]
 # Comma-separated list of API scopes. Match these to what your code actually
 # uses — the AppApprove pre-submission checker flags scope drift.
-scopes = "read_products"
+scopes = "read_products,read_orders,read_customers,write_themes"
 
 [auth]
 redirect_urls = [
   "https://test-reviews-mcp.appapprove.app/auth/callback"
 ]
+
+# Storefront app proxy — exposes /apps/reviews/* on the merchant's domain
+# and forwards to this Worker's /apps/reviews/* routes (prefix + subpath).
+# The `url` placeholder is overwritten by the AppApprove deploy pipeline
+# with the live Worker URL on every push.
+[app_proxy]
+url = "https://test-reviews-mcp.appapprove.app/apps/reviews"
+subpath = "reviews"
+prefix = "apps"
 
 [webhooks]
 api_version = "2025-01"
@@ -36,6 +45,18 @@ api_version = "2025-01"
   [[webhooks.subscriptions]]
   topics = [ "app_subscriptions/update" ]
   uri = "/webhooks/app_subscriptions/update"
+
+  [[webhooks.subscriptions]]
+  topics = [ "orders/fulfilled" ]
+  uri = "/webhooks/orders/fulfilled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "orders/create" ]
+  uri = "/webhooks/orders/create"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
 
 [pos]
 embedded = false

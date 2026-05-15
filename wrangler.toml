@@ -41,15 +41,36 @@ directory = "./build/client"
 # time. Don't edit the [vars] section by hand — use the AppApprove dashboard.
 [vars]
 APPAPPROVE_PROJECT_SLUG = "test-reviews-mcp"
+# Public R2 host used when generating photo URLs on the storefront. If
+# unset, photo upload is disabled and the form degrades gracefully.
+# AppApprove fills the live value at deploy time when the bucket is
+# attached to a public dev-bucket subdomain.
+REVIEWS_R2_PUBLIC_HOST = ""
 
-# CF Cron Triggers — uncomment + add schedules here, then mirror them in
-# appapprove.config.ts `crons` so the dispatcher knows which handler to
-# call. AppApprove's deploy pipeline diffs the two and warns on drift.
-# [triggers]
-# crons = [
-#   "0 * * * *",        # hourly
-#   "0 0 * * *",        # daily at 00:00 UTC
-# ]
+# D1 — primary durable storage. AppApprove auto-provisions on first
+# deploy (Phase F-118). database_name doubles as the binding's logical
+# name; database_id is overwritten by the deploy pipeline.
+[[d1_databases]]
+binding = "D1"
+database_name = "test-reviews-mcp-d1"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+# R2 — customer-uploaded review photos. Bucket is opt-in: when unbound
+# (e.g. R2 not yet enabled on the Cloudflare account), photo upload is
+# silently disabled and the storefront form posts without a photo.
+[[r2_buckets]]
+binding = "REVIEWS_R2_BUCKET"
+bucket_name = "test-reviews-mcp-photos"
+
+# CF Cron Triggers — drives the review-request + reminder email pipeline.
+# Mirrored in appapprove.config.ts `crons` so the dispatcher knows which
+# handler to call. AppApprove's deploy pipeline diffs the two and warns
+# on drift.
+[triggers]
+crons = [
+  "*/15 * * * *",      # email pipeline: send due request + reminder emails
+  "0 8 * * *",         # GDPR deadline scan (pre-existing)
+]
 
 # CF Queues — define a producer + consumer for each queue you use. The
 # AppApprove deploy pipeline auto-provisions the queue on first deploy.

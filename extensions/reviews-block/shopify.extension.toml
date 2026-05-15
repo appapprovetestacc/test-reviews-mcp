@@ -1,0 +1,16 @@
+# Storefront block that renders the review widget on product pages.
+# Capabilities deliberately allow network_access so the block can fetch
+# /apps/reviews/list from the app proxy. block_progress = false keeps
+# the theme render fast — the block hydrates after the section paints.
+
+api_version = "2025-10"
+
+[[extensions]]
+type = "theme"
+name = "Product reviews"
+handle = "reviews-block"
+
+  [extensions.capabilities]
+  network_access = true
+  block_progress = false
+  api_access = false

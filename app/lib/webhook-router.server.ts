@@ -35,6 +35,9 @@ const HANDLERS: Record<string, () => Promise<{ default: WebhookHandler }>> = {
   "customers/redact": () => import("../webhooks/customers-redact"),
   "shop/redact": () => import("../webhooks/shop-redact"),
   "app_subscriptions/update": () => import("../webhooks/app-subscriptions-update"),
+  "orders/fulfilled": () => import("../webhooks/orders-fulfilled"),
+  "orders/create": () => import("../webhooks/orders-create"),
+  "app/uninstalled": () => import("../webhooks/app-uninstalled"),
   // AppApprove codegen extends this map from appapprove.config.ts at build time.
 };
 

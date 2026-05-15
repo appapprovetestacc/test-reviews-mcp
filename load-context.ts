@@ -46,6 +46,18 @@ export interface Env {
   // proxy (forced from = noreply-{slug}@apps.appapprove.com).
   RESEND_API_KEY?: string;
   MAIL_SENDER_FROM?: string;
+  // Sender address for review-request + reminder emails. When unset
+  // mail.server.ts falls back to onboarding@resend.dev with a banner
+  // in the admin so the merchant knows to set their own.
+  RESEND_FROM?: string;
+  // Public R2 host used to build photo URLs on the storefront (e.g.
+  // https://pub-<id>.r2.dev). Unset = photo upload disabled.
+  REVIEWS_R2_PUBLIC_HOST?: string;
+  // Dry-run flag for the email pipeline. When "1", emails are logged
+  // rather than sent — useful for QA against a dev store.
+  DRY_RUN_EMAILS?: "0" | "1";
+  // R2 bucket binding for review photos. Declared in wrangler.toml.
+  REVIEWS_R2_BUCKET?: R2Bucket;
   // Optional Cloudflare bindings — declared here so AI-generated routes
   // that reference env.D1 / env.R2 / env.QUEUE / env.MY_DO compile cleanly
   // even when the user hasn't yet bound them in wrangler.toml. Bindings

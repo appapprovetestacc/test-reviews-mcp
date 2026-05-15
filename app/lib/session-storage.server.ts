@@ -10,7 +10,13 @@ export interface OfflineSession {
   shop: string;
   accessToken: string;
   scope: string;
-  storedAt: number;
+  storedAt?: number;
+  // Optional metadata kept for compatibility with the
+  // @shopify/shopify-app-remix Session shape (preview-mode sessions
+  // set `id` / `state` / `isOnline` as sentinels).
+  id?: string;
+  state?: string;
+  isOnline?: boolean;
 }
 
 const memory = new Map<string, OfflineSession>();

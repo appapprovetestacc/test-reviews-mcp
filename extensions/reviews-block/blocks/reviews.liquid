@@ -1,0 +1,165 @@
+{% comment %}
+  Reviews block — append/Add Block on a product page section. Renders
+  star summary + paginated review list + write-a-review form + Q&A.
+  Progressive enhancement: the server emits an explanatory <noscript>
+  block so non-JS visitors still see the section heading.
+
+  All styling uses theme CSS variables — no hardcoded brand colors.
+{% endcomment %}
+
+{%- assign product_id = product.id | default: 0 -%}
+{%- assign show_qa = block.settings.show_qa -%}
+{%- assign heading = block.settings.heading | default: 'Reviews' -%}
+{%- assign qa_heading = block.settings.qa_heading | default: 'Questions & answers' -%}
+
+<div
+  class="rv-block"
+  data-rv-block
+  data-product-id="{{ product_id }}"
+  data-page-size="{{ block.settings.page_size | default: 5 }}"
+  data-show-qa="{% if show_qa %}1{% else %}0{% endif %}"
+  data-allow-photos="{% if block.settings.allow_photos %}1{% else %}0{% endif %}"
+  {{ block.shopify_attributes }}
+>
+  <h2 class="rv-block__title">{{ heading | escape }}</h2>
+
+  <div class="rv-summary" data-rv-summary aria-live="polite">
+    <noscript>
+      <p class="rv-noscript">Enable JavaScript to view customer reviews.</p>
+    </noscript>
+  </div>
+
+  <ul class="rv-list" data-rv-list role="list"></ul>
+
+  <nav class="rv-pagination" data-rv-pagination aria-label="Reviews pagination"></nav>
+
+  <details class="rv-form-wrapper">
+    <summary class="rv-form-toggle">Write a review</summary>
+    <form class="rv-form" data-rv-form novalidate>
+      <div class="rv-status" data-rv-form-status role="status" aria-live="polite"></div>
+
+      <label class="rv-field">
+        <span class="rv-field__label">Your rating</span>
+        <span class="rv-stars-input" role="radiogroup" aria-label="Rating">
+          {% for i in (1..5) %}
+            <label class="rv-star-radio">
+              <input type="radio" name="rating" value="{{ i }}" required>
+              <span aria-hidden="true">★</span>
+              <span class="rv-visually-hidden">{{ i }} star{% if i != 1 %}s{% endif %}</span>
+            </label>
+          {% endfor %}
+        </span>
+      </label>
+
+      <label class="rv-field">
+        <span class="rv-field__label">Review title</span>
+        <input type="text" name="title" maxlength="120" autocomplete="off">
+      </label>
+
+      <label class="rv-field">
+        <span class="rv-field__label">Your review</span>
+        <textarea name="body" rows="4" required maxlength="4000"></textarea>
+      </label>
+
+      <div class="rv-field-row">
+        <label class="rv-field">
+          <span class="rv-field__label">Your name</span>
+          <input type="text" name="customerName" required maxlength="120" autocomplete="name">
+        </label>
+        <label class="rv-field">
+          <span class="rv-field__label">Email</span>
+          <input type="email" name="customerEmail" required maxlength="254" autocomplete="email">
+        </label>
+      </div>
+
+      <label class="rv-field rv-photo-field" data-rv-photo-field hidden>
+        <span class="rv-field__label">Add a photo (optional)</span>
+        <input type="file" name="photo" accept="image/jpeg,image/png,image/webp,image/gif" data-rv-photo>
+      </label>
+
+      <button type="submit" class="rv-button rv-button--primary" data-rv-submit>
+        <span data-rv-submit-label>Submit review</span>
+      </button>
+    </form>
+  </details>
+
+  {%- if show_qa -%}
+    <section class="rv-qa">
+      <h2 class="rv-block__title">{{ qa_heading | escape }}</h2>
+      <ul class="rv-qa-list" data-rv-qa-list role="list"></ul>
+      <details class="rv-form-wrapper">
+        <summary class="rv-form-toggle">Ask a question</summary>
+        <form class="rv-form" data-rv-qa-form novalidate>
+          <div class="rv-status" data-rv-qa-status role="status" aria-live="polite"></div>
+          <label class="rv-field">
+            <span class="rv-field__label">Your question</span>
+            <textarea name="body" rows="3" required maxlength="4000"></textarea>
+          </label>
+          <div class="rv-field-row">
+            <label class="rv-field">
+              <span class="rv-field__label">Your name</span>
+              <input type="text" name="customerName" required maxlength="120" autocomplete="name">
+            </label>
+            <label class="rv-field">
+              <span class="rv-field__label">Email</span>
+              <input type="email" name="customerEmail" required maxlength="254" autocomplete="email">
+            </label>
+          </div>
+          <button type="submit" class="rv-button rv-button--primary" data-rv-qa-submit>
+            <span data-rv-qa-submit-label>Send question</span>
+          </button>
+        </form>
+      </section>
+    </section>
+  {%- endif -%}
+</div>
+
+{{ 'reviews.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'reviews.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Product reviews",
+  "target": "section",
+  "stylesheet": "reviews.css",
+  "javascript": "reviews.js",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Reviews heading",
+      "default": "Reviews"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_qa",
+      "label": "Show questions & answers",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "qa_heading",
+      "label": "Q&A heading",
+      "default": "Questions & answers"
+    },
+    {
+      "type": "range",
+      "id": "page_size",
+      "label": "Reviews per page",
+      "min": 3,
+      "max": 25,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_photos",
+      "label": "Allow photo uploads",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

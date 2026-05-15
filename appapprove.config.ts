@@ -16,16 +16,16 @@ const config: AppApproveConfig = {
     "customers/redact": "~/webhooks/customers-redact",
     "shop/redact": "~/webhooks/shop-redact",
     "app_subscriptions/update": "~/webhooks/app-subscriptions-update",
+    "orders/fulfilled": "~/webhooks/orders-fulfilled",
+    "orders/create": "~/webhooks/orders-create",
+    "app/uninstalled": "~/webhooks/app-uninstalled",
   },
   crons: {
-    // CF Cron Trigger schedules. The example handler runs hourly.
-    // To enable, also add the same schedule to wrangler.toml `[triggers]`.
-    // "0 * * * *": "~/crons/example-cleanup",
-
+    // Reviews + reminders email pipeline. Mirrored in wrangler.toml.
+    "*/15 * * * *": "~/crons/email-pipeline",
     // Daily GDPR deadline scan — warns 7 days before any open
     // customers/data_request, customers/redact, or shop/redact request
-    // would breach the 30-day SLA. Wire up by ALSO adding "0 8 * * *" to
-    // wrangler.toml [triggers] crons.
+    // would breach the 30-day SLA.
     "0 8 * * *": "~/crons/gdpr-deadline-check",
   },
   env: {
