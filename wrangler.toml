@@ -53,7 +53,7 @@ REVIEWS_R2_PUBLIC_HOST = ""
 [[d1_databases]]
 binding = "D1"
 database_name = "test-reviews-mcp-d1"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "689e1e75-6f16-4b33-9eb8-6e94c0f5e993"
 
 # R2 — customer-uploaded review photos. Bucket is opt-in: when unbound
 # (e.g. R2 not yet enabled on the Cloudflare account), photo upload is
