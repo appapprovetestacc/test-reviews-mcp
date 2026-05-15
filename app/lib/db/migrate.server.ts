@@ -1,7 +1,7 @@
 import type { AppLoadContext } from "@remix-run/cloudflare";
 import type { Env } from "../../../load-context";
 import journalRaw from "../../../drizzle/meta/_journal.json";
-import migration0 from "../../../drizzle/0000_init_reviews.sql?raw";
+import { MIGRATIONS } from "./migrations";
 
 // Tiny Drizzle-compatible migration runner. Walks the journal in idx
 // order, applies any SQL whose tag is not yet recorded in
@@ -9,6 +9,13 @@ import migration0 from "../../../drizzle/0000_init_reviews.sql?raw";
 // or a one-off route. The journal acts as the source of truth for
 // migration order — Drizzle silently skips files not registered there
 // (caused F-124/F-126 P0s in AppApprove core).
+//
+// Migration SQL is inlined in `./migrations.ts` rather than imported
+// from drizzle/*.sql via `?raw` — the wrangler/esbuild bundler that
+// builds the deployed Worker has no .sql loader, so `?raw` works in
+// Vite-dev only and breaks the deploy. The on-disk .sql files exist
+// so wrangler-d1-migrations + the Drizzle CLI see them; the Worker
+// reads from the TS const.
 
 interface JournalEntry {
   idx: number;
@@ -21,9 +28,9 @@ interface Journal {
   entries: JournalEntry[];
 }
 
-const SQL_BY_TAG: Record<string, string> = {
-  "0000_init_reviews": migration0,
-};
+const SQL_BY_TAG: Record<string, string> = Object.fromEntries(
+  MIGRATIONS.map((m) => [m.tag, m.sql]),
+);
 
 function splitStatements(sql: string): string[] {
   return sql
