@@ -1,0 +1,44 @@
+# Shopify App configuration. AppApprove syncs this file to your Partner
+# Dashboard on every deploy. Don't edit client_id by hand — it's set when
+# AppApprove provisions the app entry (Sprint 30: Partner-API integration).
+
+name = "Test Reviews App"
+handle = "test-reviews-mcp"
+client_id = ""
+application_url = "https://test-reviews-mcp.appapprove.app"
+embedded = true
+
+[access_scopes]
+# Comma-separated list of API scopes. Match these to what your code actually
+# uses — the AppApprove pre-submission checker flags scope drift.
+scopes = "read_products"
+
+[auth]
+redirect_urls = [
+  "https://test-reviews-mcp.appapprove.app/auth/callback"
+]
+
+[webhooks]
+api_version = "2025-01"
+
+  [[webhooks.subscriptions]]
+  topics = [ "customers/data_request" ]
+  uri = "/webhooks/customers/data_request"
+
+  [[webhooks.subscriptions]]
+  topics = [ "customers/redact" ]
+  uri = "/webhooks/customers/redact"
+
+  [[webhooks.subscriptions]]
+  topics = [ "shop/redact" ]
+  uri = "/webhooks/shop/redact"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app_subscriptions/update" ]
+  uri = "/webhooks/app_subscriptions/update"
+
+[pos]
+embedded = false
+
+[build]
+include_config_on_deploy = true
